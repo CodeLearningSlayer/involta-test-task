@@ -14,7 +14,8 @@
 4. Multer для работы со скачиванием файла
 ----------------------------------------------------
 Чтобы поднять:
-1. Перейти в папку **front**, прописать `docker build -t frontend-image .`
-2. Выйти, перейти в папку **server**, прописать `docker build -t backend-image .`
-3. Выйти в корневую папку, прописать `docker-compose up`
-4. Перейти по адресу **localhost:1234**
+1. Прописать в терминале `git clone https://github.com/CodeLearningSlayer/involta-test-task.git`
+2. Перейти в папку **front**, прописать `docker build -t frontend-image .`
+3. Выйти, перейти в папку **server**, прописать `docker build -t backend-image .`
+4. Выйти в корневую папку, прописать `docker-compose up`
+5. Перейти по адресу **localhost:1234**
