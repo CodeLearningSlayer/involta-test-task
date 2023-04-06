@@ -1,0 +1,21 @@
+body {
+  max-width: 1230px;
+  background-color: #e6d1d1;
+  margin: 0 auto;
+  padding: 15px;
+}
+
+.save-button {
+  color: #fff;
+  cursor: pointer;
+  background-color: #1084e2;
+  border: none;
+  padding: 15px;
+}
+
+#editorjs {
+  background-color: #fff;
+  margin-bottom: 30px;
+}
+
+/*# sourceMappingURL=index.2e8c441c.css.map */

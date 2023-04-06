@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  frontend:
+    image: frontend-image
+    ports:
+      - "1234:1234"
+    depends_on:
+      - backend
+  backend:
+    image: backend-image
+    ports:
+      - "3010:3010"
