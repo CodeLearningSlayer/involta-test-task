@@ -577,6 +577,7 @@ class Pinner {
     constructor(api){
         this._pinned = {};
         this._api = api;
+        console.log(this.allBlocks);
     }
     getBlock() {
         return this._block;
@@ -586,15 +587,22 @@ class Pinner {
             if (block.data.fixed === true) this._pinned[index] = this._api.blocks.getBlockByIndex(index);
         });
     }
+    updateAllBlocks() {
+        this.allBlocks = this.getAllBlocks();
+    }
+    getAllBlocks() {
+        return Array.from(document.querySelectorAll(".ce-block"));
+    }
     hideTunesBlock() {
         const toolbar = document.querySelector(".ce-toolbar");
-        const allBlocks = Array.from(document.querySelectorAll(".ce-block"));
+        this.updateAllBlocks();
         document.querySelector(".codex-editor__redactor").addEventListener("mouseover", (e)=>{
             let flag = false;
-            allBlocks.forEach((item, index)=>{
+            this.allBlocks.forEach((item, index)=>{
                 const isToolboxOpened = document.querySelector(".codex-editor--toolbox-opened") ?? false;
                 const isSelection = document.querySelector(".ce-block--selected") ?? false;
-                if (e.composedPath().indexOf(item) != -1 && index in Object.keys(this._pinned) && !isSelection && !isToolboxOpened) flag = true;
+                const isOnlyFixedBlocks = this.getLastIndexOfPinnedBlocks() + 1 == this.allBlocks.length;
+                if (e.composedPath().indexOf(item) != -1 && index in Object.keys(this._pinned) && !isSelection && !isToolboxOpened || isOnlyFixedBlocks) flag = true;
                 if (flag == true) toolbar.classList.add("hidden");
                 else toolbar.classList.remove("hidden");
             });
@@ -682,7 +690,7 @@ const editor = new (0, _editorjsDefault.default)({
                         style: "error"
                     });
                     api.blocks.delete(event.detail.index);
-                }
+                } else blockToPin.updateAllBlocks();
                 break;
             case "block-moved":
                 if (event.detail.toIndex == lastIndexOfPinnedBlocks) {
@@ -695,8 +703,6 @@ const editor = new (0, _editorjsDefault.default)({
                 break;
         }
         console.log(event.type);
-    // console.log(event.detail.index);
-    // console.log(event.details);
     }
 });
 let saveBtn = document.querySelector(".save-button");
@@ -716,7 +722,7 @@ editor.isReady.then(()=>{
 }) // fetch("http://localhost:3010/").then().then(res => console.log(res.text));
 ;
 
-},{"@editorjs/editorjs":"4eyUD","@editorjs/header":"kkSVA","@editorjs/list":"1ChUe","@editorjs/embed":"4qeqT","@editorjs/image":"eKOQX","@editorjs/simple-image":"1LBNh","./css/style.scss":"1IiJn","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","codex-notifier":"943aq"}],"4eyUD":[function(require,module,exports) {
+},{"@editorjs/editorjs":"4eyUD","@editorjs/header":"kkSVA","@editorjs/list":"1ChUe","@editorjs/embed":"4qeqT","@editorjs/image":"eKOQX","@editorjs/simple-image":"1LBNh","./css/style.scss":"1IiJn","codex-notifier":"943aq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4eyUD":[function(require,module,exports) {
 /*! For license information please see editor.js.LICENSE.txt */ !function(e, t1) {
     module.exports = t1();
 }(window, function() {
@@ -21696,37 +21702,7 @@ editor.isReady.then(()=>{
     ]).default;
 });
 
-},{}],"1IiJn":[function() {},{}],"gkKU3":[function(require,module,exports) {
-exports.interopDefault = function(a) {
-    return a && a.__esModule ? a : {
-        default: a
-    };
-};
-exports.defineInteropFlag = function(a) {
-    Object.defineProperty(a, "__esModule", {
-        value: true
-    });
-};
-exports.exportAll = function(source, dest) {
-    Object.keys(source).forEach(function(key) {
-        if (key === "default" || key === "__esModule" || dest.hasOwnProperty(key)) return;
-        Object.defineProperty(dest, key, {
-            enumerable: true,
-            get: function() {
-                return source[key];
-            }
-        });
-    });
-    return dest;
-};
-exports.export = function(dest, destName, get) {
-    Object.defineProperty(dest, destName, {
-        enumerable: true,
-        get: get
-    });
-};
-
-},{}],"943aq":[function(require,module,exports) {
+},{}],"1IiJn":[function() {},{}],"943aq":[function(require,module,exports) {
 !function(t, e) {
     module.exports = e();
 }(window, function() {
@@ -22074,6 +22050,36 @@ exports.export = function(dest, destName, get) {
         }
     ]);
 });
+
+},{}],"gkKU3":[function(require,module,exports) {
+exports.interopDefault = function(a) {
+    return a && a.__esModule ? a : {
+        default: a
+    };
+};
+exports.defineInteropFlag = function(a) {
+    Object.defineProperty(a, "__esModule", {
+        value: true
+    });
+};
+exports.exportAll = function(source, dest) {
+    Object.keys(source).forEach(function(key) {
+        if (key === "default" || key === "__esModule" || dest.hasOwnProperty(key)) return;
+        Object.defineProperty(dest, key, {
+            enumerable: true,
+            get: function() {
+                return source[key];
+            }
+        });
+    });
+    return dest;
+};
+exports.export = function(dest, destName, get) {
+    Object.defineProperty(dest, destName, {
+        enumerable: true,
+        get: get
+    });
+};
 
 },{}]},["jC2qd","8lqZg"], "8lqZg", "parcelRequire6439")
 

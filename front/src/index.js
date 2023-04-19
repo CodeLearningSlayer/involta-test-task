@@ -12,6 +12,7 @@ class Pinner {
     constructor(api){
         this._pinned = {}
         this._api = api;
+        console.log(this.allBlocks);
     }
 
     getBlock() {
@@ -26,16 +27,24 @@ class Pinner {
         })
     }
 
+    updateAllBlocks() {
+        this.allBlocks = this.getAllBlocks();
+    }
+
+    getAllBlocks(){
+        return Array.from(document.querySelectorAll(".ce-block"));
+    }
+
     hideTunesBlock() {
-        const toolbar = document.querySelector(".ce-toolbar");
-        const allBlocks = Array.from(document.querySelectorAll(".ce-block"));
-        
+        const toolbar = document.querySelector(".ce-toolbar");        
+        this.updateAllBlocks();
         document.querySelector(".codex-editor__redactor").addEventListener("mouseover", (e) => {
             let flag = false;
-            allBlocks.forEach((item, index) => {
+            this.allBlocks.forEach((item, index) => {
                 const isToolboxOpened = document.querySelector(".codex-editor--toolbox-opened") ?? false;
                 const isSelection = document.querySelector(".ce-block--selected") ?? false;
-                if (e.composedPath().indexOf(item) != -1 && index in Object.keys(this._pinned) && !isSelection && !isToolboxOpened){
+                const isOnlyFixedBlocks = this.getLastIndexOfPinnedBlocks() + 1 == this.allBlocks.length
+                if (e.composedPath().indexOf(item) != -1 && index in Object.keys(this._pinned) && !isSelection && !isToolboxOpened || isOnlyFixedBlocks){
                     flag = true;
                 }
             if (flag == true)
@@ -127,6 +136,7 @@ const editor = new EditorJS({
                     })
                     api.blocks.delete(event.detail.index);
                 }
+                else blockToPin.updateAllBlocks();
                 break;
             
             case 'block-moved':
