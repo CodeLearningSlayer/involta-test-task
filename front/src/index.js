@@ -8,11 +8,20 @@ import "./css/style.scss";
 import notifier from "codex-notifier";
 import {ConfirmNotifierOptions, NotifierOptions, PromptNotifierOptions} from 'codex-notifier';
 
+const getNumOfBlock = (elem) => {
+    let findedIndex = -1;
+    Array.from(document.querySelector(".codex-editor__redactor").children).forEach((item, index) => {
+        if (item.isEqualNode(elem)){
+            findedIndex = index;
+        }
+    })
+    return findedIndex;
+}
+
 class Pinner {
     constructor(api){
         this._pinned = {}
         this._api = api;
-        console.log(this.allBlocks);
     }
 
     getBlock() {
@@ -35,6 +44,20 @@ class Pinner {
         return Array.from(document.querySelectorAll(".ce-block"));
     }
 
+
+    hidePopovers() {
+        try {
+            const popoverItems = Array.from(document.querySelector(".ce-popover--opened .ce-popover__items")?.children);
+            const cleanPopovers = ['move-up', 'delete', 'move-down'];
+            popoverItems.forEach((item) => {
+                if (cleanPopovers.includes(item.getAttribute("data-item-name"))){
+                    item.style.display = "none";
+                }
+            });
+        } catch (e){}
+        
+    }
+
     hideTunesBlock() {
         const toolbar = document.querySelector(".ce-toolbar");        
         this.updateAllBlocks();
@@ -52,10 +75,6 @@ class Pinner {
             else toolbar.classList.remove("hidden");
         })
         }, true)
-    }
-
-    logApi(){
-        console.log(this._api)
     }
     
     getLastIndexOfPinnedBlocks(){
@@ -149,7 +168,6 @@ const editor = new EditorJS({
                 }
                 break;
         } 
-        console.log(event.type);
     }
 });
 let saveBtn = document.querySelector(".save-button");
@@ -165,11 +183,32 @@ blockToPin = new Pinner(editor);
 
 editor.isReady
     .then(() => {
+        let lastFocused;
+        const target = document.querySelector(".codex-editor__redactor");
+        const observer = new MutationObserver((mutations) => {
+            let findedBlock;
+            mutations.forEach((mutationRecord) =>{
+                if (mutationRecord.target.classList.contains("ce-block--selected")){
+                    findedBlock = mutationRecord.target;
+                }
+            });
+            lastFocused = getNumOfBlock(findedBlock) !== -1 ? getNumOfBlock(findedBlock) : lastFocused;
+            if (lastFocused <= blockToPin.getLastIndexOfPinnedBlocks()){
+                blockToPin.hidePopovers()
+            }
+          });
+  
+          observer.observe(target, {
+            subtree: true,
+            childList: true,
+            attributeFilter: ['class'],
+            attributes: true
+          });
+        // blockToPin.hidePopovers();
         blockToPin.getPinnedBlocks(); // так достучимся до проверки
-        blockToPin.hideTunesBlock();
+        // blockToPin.hideTunesBlock();
     })
     .catch(error => {
         console.log(error);
     }) 
 
-// fetch("http://localhost:3010/").then().then(res => console.log(res.text));

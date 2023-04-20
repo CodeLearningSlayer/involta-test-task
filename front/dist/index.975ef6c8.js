@@ -573,11 +573,17 @@ var _simpleImageDefault = parcelHelpers.interopDefault(_simpleImage);
 var _styleScss = require("./css/style.scss");
 var _codexNotifier = require("codex-notifier");
 var _codexNotifierDefault = parcelHelpers.interopDefault(_codexNotifier);
+const getNumOfBlock = (elem)=>{
+    let findedIndex = -1;
+    Array.from(document.querySelector(".codex-editor__redactor").children).forEach((item, index)=>{
+        if (item.isEqualNode(elem)) findedIndex = index;
+    });
+    return findedIndex;
+};
 class Pinner {
     constructor(api){
         this._pinned = {};
         this._api = api;
-        console.log(this.allBlocks);
     }
     getBlock() {
         return this._block;
@@ -593,6 +599,19 @@ class Pinner {
     getAllBlocks() {
         return Array.from(document.querySelectorAll(".ce-block"));
     }
+    hidePopovers() {
+        try {
+            const popoverItems = Array.from(document.querySelector(".ce-popover--opened .ce-popover__items")?.children);
+            const cleanPopovers = [
+                "move-up",
+                "delete",
+                "move-down"
+            ];
+            popoverItems.forEach((item)=>{
+                if (cleanPopovers.includes(item.getAttribute("data-item-name"))) item.style.display = "none";
+            });
+        } catch (e) {}
+    }
     hideTunesBlock() {
         const toolbar = document.querySelector(".ce-toolbar");
         this.updateAllBlocks();
@@ -607,9 +626,6 @@ class Pinner {
                 else toolbar.classList.remove("hidden");
             });
         }, true);
-    }
-    logApi() {
-        console.log(this._api);
     }
     getLastIndexOfPinnedBlocks() {
         return Number(Object.keys(this._pinned).slice(-1));
@@ -702,7 +718,6 @@ const editor = new (0, _editorjsDefault.default)({
                 }
                 break;
         }
-        console.log(event.type);
     }
 });
 let saveBtn = document.querySelector(".save-button");
@@ -715,12 +730,30 @@ saveBtn.addEventListener("click", function() {
 });
 blockToPin = new Pinner(editor);
 editor.isReady.then(()=>{
+    let lastFocused;
+    const target = document.querySelector(".codex-editor__redactor");
+    const observer = new MutationObserver((mutations)=>{
+        let findedBlock;
+        mutations.forEach((mutationRecord)=>{
+            if (mutationRecord.target.classList.contains("ce-block--selected")) findedBlock = mutationRecord.target;
+        });
+        lastFocused = getNumOfBlock(findedBlock) !== -1 ? getNumOfBlock(findedBlock) : lastFocused;
+        if (lastFocused <= blockToPin.getLastIndexOfPinnedBlocks()) blockToPin.hidePopovers();
+    });
+    observer.observe(target, {
+        subtree: true,
+        childList: true,
+        attributeFilter: [
+            "class"
+        ],
+        attributes: true
+    });
+    // blockToPin.hidePopovers();
     blockToPin.getPinnedBlocks(); // так достучимся до проверки
-    blockToPin.hideTunesBlock();
+// blockToPin.hideTunesBlock();
 }).catch((error)=>{
     console.log(error);
-}) // fetch("http://localhost:3010/").then().then(res => console.log(res.text));
-;
+});
 
 },{"@editorjs/editorjs":"4eyUD","@editorjs/header":"kkSVA","@editorjs/list":"1ChUe","@editorjs/embed":"4qeqT","@editorjs/image":"eKOQX","@editorjs/simple-image":"1LBNh","./css/style.scss":"1IiJn","codex-notifier":"943aq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4eyUD":[function(require,module,exports) {
 /*! For license information please see editor.js.LICENSE.txt */ !function(e, t1) {
